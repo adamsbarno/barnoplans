@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description" content="Review Barno Plans house plan details, features, pricing, images, and digital package information.">
+    <meta property="og:title" content="House Plan Details | Barno Plans">
+    <meta property="og:description" content="Review the details and package information for a Barno Plans house design.">
+    <meta property="og:type" content="product">
+
+    <title>House Plan Details | Barno Plans</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+
+    <!-- Navigation -->
+    <header class="navbar">
+
+        <div class="brand" aria-label="Barno Plans home">
+            <svg class="brand-logo" viewBox="0 0 64 64" role="img" aria-label="Barno Plans logo">
+                <path class="roof-shape" d="M10 26L32 10L54 26V48C54 50.2 52.2 52 50 52H14C11.8 52 10 50.2 10 48V26Z"></path>
+                <path class="roof-line" d="M18 24L32 14L46 24"></path>
+                <text x="32" y="39" text-anchor="middle" class="brand-letter">B</text>
+            </svg>
+            <div class="brand-name">
+                <span>Barno</span>
+                <small>PLANS</small>
+            </div>
+        </div>
+
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="main-navigation">Menu</button>
+        <nav id="main-navigation">
+            <a href="index.html">Home</a>
+            <a href="plans.html">House Plans</a>
+            <a href="index.html#about">About</a>
+            <a href="index.html#reviews">Reviews</a>
+            <a href="index.html#contact">Contact</a>
+            <a href="https://web.facebook.com/profile.php?id=100093539746636" target="_blank" rel="noopener noreferrer">Facebook</a>
+        </nav>
+
+    </header>
+
+
+    <!-- Product Section -->
+    <section class="product-page">
+
+        <!-- Images -->
+        <div class="product-gallery">
+
+            <div class="main-product-image">
+                House Render
+            </div>
+
+            <div class="thumbnail-container">
+
+                <div class="thumbnail">
+                    Exterior
+                </div>
+
+                <div class="thumbnail">
+                    Floor Plan
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Product Information -->
+        <div class="product-info">
+
+            <p class="product-category">
+                Bungalow
+            </p>
+
+            <h1>
+                4 Bedroom Bungalow
+            </h1>
+
+            <p class="product-description">
+
+                A spacious four-bedroom bungalow with practical family living areas and a modern layout.
+
+            </p>
+
+
+            <!-- Price -->
+            <div class="product-price">
+
+                KSh 2,000
+
+            </div>
+
+
+            <!-- Features -->
+            <div class="features">
+
+                <div>
+                    <strong>4</strong>
+                    <span>Bedrooms</span>
+                </div>
+
+                <div>
+                    <strong>2</strong>
+                    <span>Bathrooms</span>
+                </div>
+
+                <div>
+                    <strong>1</strong>
+                    <span>Floor</span>
+                </div>
+
+            </div>
+
+
+            <!-- Purchase -->
+            <div class="purchase-section">
+
+                <button class="manual-payment-button" type="button">
+                    Buy This Plan - Pay Manually
+                </button>
+
+            </div>
+
+
+            <!-- Included -->
+            <div class="included">
+
+                <h2>
+                    What's Included
+                </h2>
+
+                <ul>
+
+                    <li>Floor plans</li>
+
+                    <li>Elevations</li>
+
+                    <li>Building sections</li>
+
+                    <li>Roof plan</li>
+
+                    <li>Detailed dimensions</li>
+
+                    <li>Digital PDF files</li>
+
+                </ul>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+    <!-- Description -->
+    <section class="product-description-section">
+
+        <h2>
+            About This House Plan
+        </h2>
+
+        <p>
+
+            This plan description is populated dynamically from the selected
+            product in the catalog. Each house plan includes a tailored
+            summary, features, and pricing.
+
+        </p>
+
+    </section>
+
+
+    <!-- Disclaimer -->
+    <section class="product-note">
+
+        <h3>Important</h3>
+
+        <p>
+
+            The drawings supplied with this product are provided according
+            to the package description above. Requirements for local
+            approvals, structural design and other specialist documentation
+            may vary depending on the project.
+
+        </p>
+
+    </section>
+
+
+    <!-- Footer -->
+    <footer>
+
+        <h3>Barno Plans</h3>
+
+        <p>
+            House plans, architectural designs and custom solutions for clients worldwide.
+        </p>
+
+        <p>
+            © 2026 Barno Plans. All rights reserved.
+        </p>
+        <p class="legal-links">
+            <a href="privacy.html">Privacy</a>
+            <a href="terms.html">Terms</a>
+            <a href="refunds.html">Refund Policy</a>
+            <a href="disclaimer.html">Disclaimer</a>
+        </p>
+
+    </footer>
+
+    <div id="image-modal" class="image-modal" aria-hidden="true">
+        <div class="image-modal-backdrop" data-close-image-modal="true"></div>
+        <div class="image-modal-content" role="dialog" aria-modal="true" aria-label="Plan image preview">
+            <button class="image-modal-close" type="button" aria-label="Close image preview">&times;</button>
+            <img id="image-modal-img" src="" alt="Expanded plan image">
+        </div>
+    </div>
+
+    <!-- M-Pesa Payment Modal -->
+    <div id="mpesa-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>M-Pesa Payment</h2>
+            <p>Complete your payment via M-Pesa</p>
+            <div class="payment-info">
+                <p><strong>Plan:</strong> <span id="modal-plan-name"></span></p>
+                <p><strong>Amount:</strong> KSh <span id="modal-plan-price"></span></p>
+                <p><strong>Phone:</strong> <span id="modal-phone"></span></p>
+            </div>
+            <p style="color: #666; margin-top: 15px; font-size: 14px;">
+                An M-Pesa prompt will be sent to your phone. Please enter your M-Pesa PIN to complete the payment.
+            </p>
+            <button id="confirm-payment" class="button" style="width: 100%; margin-top: 20px;">
+                I've Completed Payment
+            </button>
+        </div>
+    </div>
+
+    <div id="manual-payment-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <button class="close-modal manual-payment-close" type="button" aria-label="Close manual payment form">&times;</button>
+            <h2>Manual M-Pesa Payment</h2>
+            <p>Send the plan amount to <strong>+254 710 304 401</strong>, then submit your transaction code for confirmation.</p>
+            <form id="manual-payment-form">
+                <input id="manual-plan-name" type="hidden">
+                <label for="manual-customer-name">Your name</label>
+                <input id="manual-customer-name" type="text" required>
+                <label for="manual-customer-phone">Your phone number</label>
+                <input id="manual-customer-phone" type="tel" placeholder="07xxxxxxxx" required>
+                <label for="manual-transaction-code">M-Pesa transaction code</label>
+                <input id="manual-transaction-code" type="text" required>
+                <button class="button" type="submit">Send for Confirmation</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="data/plans.js"></script>
+    <script type="module" src="script.js"></script>
+
+</body>
+
+</html>

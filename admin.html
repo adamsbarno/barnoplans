@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Admin | Barno Plans</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="admin-page">
+    <main class="admin-shell">
+        <section class="admin-login" id="admin-login">
+            <p class="small-heading">Barno Plans</p>
+            <h1>Admin dashboard</h1>
+            <p>Sign in to view your catalog and order records.</p>
+            <form id="admin-login-form">
+                <label for="admin-username">Username</label>
+                <input id="admin-username" name="username" required autocomplete="username">
+                <label for="admin-password">Password</label>
+                <input id="admin-password" name="password" type="password" required autocomplete="current-password">
+                <button class="button" type="submit">Sign in</button>
+                <p class="admin-message" id="admin-login-message" role="alert"></p>
+            </form>
+        </section>
+
+        <section class="admin-dashboard" id="admin-dashboard" hidden>
+            <header class="admin-header">
+                <div>
+                    <p class="small-heading">Private area</p>
+                    <h1>Catalog and orders</h1>
+                </div>
+                <button class="button secondary" id="admin-logout" type="button">Sign out</button>
+            </header>
+            <div class="admin-stats" id="admin-stats"></div>
+            <details class="admin-add-plan">
+                <summary>Add a new house plan</summary>
+                <form id="admin-add-plan-form" enctype="multipart/form-data">
+                    <label for="new-plan-name">Plan name</label>
+                    <input id="new-plan-name" name="name" required>
+                    <label for="new-plan-category">Category</label>
+                    <input id="new-plan-category" name="category" placeholder="2 Bedroom">
+                    <div class="admin-form-grid">
+                        <div><label for="new-plan-bedrooms">Bedrooms</label><input id="new-plan-bedrooms" name="bedrooms" type="number" min="1" required></div>
+                        <div><label for="new-plan-bathrooms">Bathrooms</label><input id="new-plan-bathrooms" name="bathrooms" type="number" min="0"></div>
+                        <div><label for="new-plan-floors">Floors</label><input id="new-plan-floors" name="floors" type="number" min="1" value="1"></div>
+                        <div><label for="new-plan-price">Price</label><input id="new-plan-price" name="price" type="number" min="0" required></div>
+                    </div>
+                    <label for="new-plan-description">Description</label>
+                    <textarea id="new-plan-description" name="description" rows="3"></textarea>
+                    <label for="new-plan-main">Main image</label><input id="new-plan-main" name="mainImage" type="file" accept="image/*" required>
+                    <label for="new-plan-exterior">Exterior image</label><input id="new-plan-exterior" name="exteriorImage" type="file" accept="image/*" required>
+                    <label for="new-plan-floor">Floor plan image</label><input id="new-plan-floor" name="floorImage" type="file" accept="image/*" required>
+                    <label for="new-plan-pdf">PDF package</label><input id="new-plan-pdf" name="pdf" type="file" accept="application/pdf" required>
+                    <button class="button" type="submit">Add plan</button>
+                    <p class="admin-message" id="admin-add-message" role="status"></p>
+                </form>
+            </details>
+            <h2>Plans</h2>
+            <div class="admin-table-wrap"><table class="admin-table" id="admin-plans"></table></div>
+            <h2>Orders</h2>
+            <div class="admin-table-wrap"><table class="admin-table" id="admin-orders"></table></div>
+        </section>
+    </main>
+    <script src="admin.js"></script>
+</body>
+</html>
