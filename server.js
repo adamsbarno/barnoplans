@@ -86,7 +86,8 @@ const contactLimiter = rateLimit({ windowMs: 60 * 60 * 1000, limit: 20, standard
 app.use('/api', apiLimiter);
 app.use('/pdfs', (request, response) => response.status(404).json({ error: 'PDF access requires a verified payment' }));
 app.use(express.static(__dirname, {
-    fallthrough: true
+    fallthrough: true,
+    maxAge: '7d'
 }));
 
 app.get('/api/catalog', (request, response) => {
