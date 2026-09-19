@@ -383,6 +383,6 @@ app.get('/api/download/:planId/:downloadToken', (request, response) => {
     return response.download(filePath, `${plan.name}.pdf`);
 });
 
-app.listen(process.env.PORT || 3000, '0.0.0.0', () => {
+app.listen(process.env.PORT || 3000, () => {
     console.log(`Barno Plans server running on port ${process.env.PORT || 3000}`);
 });
