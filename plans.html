@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description" content="Compare Barno Plans house designs by bedrooms, bathrooms, price, and plan type.">
+    <meta property="og:title" content="House Plans | Barno Plans">
+    <meta property="og:description" content="Compare practical house plans and find a design that fits your home.">
+    <meta property="og:type" content="website">
+
+    <title>House Plans | Barno Plans</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <header class="navbar">
+
+        <div class="brand" aria-label="Barno Plans home">
+            <svg class="brand-logo" viewBox="0 0 64 64" role="img" aria-label="Barno Plans logo">
+                <path class="roof-shape" d="M10 26L32 10L54 26V48C54 50.2 52.2 52 50 52H14C11.8 52 10 50.2 10 48V26Z"></path>
+                <path class="roof-line" d="M18 24L32 14L46 24"></path>
+                <text x="32" y="39" text-anchor="middle" class="brand-letter">B</text>
+            </svg>
+            <div class="brand-name">
+                <span>Barno</span>
+                <small>PLANS</small>
+            </div>
+        </div>
+
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="main-navigation">Menu</button>
+        <nav id="main-navigation">
+            <a href="index.html">Home</a>
+            <a href="plans.html">House Plans</a>
+            <a href="index.html#about">About</a>
+            <a href="index.html#reviews">Reviews</a>
+            <a href="index.html#contact">Contact</a>
+            <a href="https://web.facebook.com/profile.php?id=100093539746636" target="_blank" rel="noopener noreferrer">Facebook</a>
+        </nav>
+
+    </header>
+
+
+    <!-- Page Heading -->
+    <section class="plans-header">
+
+        <h1>House Plans</h1>
+
+        <p>
+            Compare practical designs, review the details, and choose a plan that fits the way you want to live.
+        </p>
+
+        <div class="plan-tools">
+            <label for="plan-search">Search plans</label>
+            <input id="plan-search" type="search" placeholder="Search by name or type">
+            <label for="plan-sort">Sort by</label>
+            <select id="plan-sort">
+                <option value="featured">Featured</option>
+                <option value="low">Price: low to high</option>
+                <option value="high">Price: high to low</option>
+            </select>
+        </div>
+
+    </section>
+
+
+    <!-- Categories -->
+    <section class="plan-categories" id="category-filters">
+
+        <button class="active">All</button>
+        <button>2 Bedroom</button>
+        <button>3 Bedroom</button>
+        <button>4 Bedroom</button>
+        <button>Bungalow</button>
+        <button>3 Bedroom All Ensuite</button>
+
+    </section>
+
+
+    <!-- Plans -->
+    <section class="plans-page">
+
+        <div class="comparison-toolbar" id="comparison-toolbar" hidden>
+            <div>
+                <strong>Compare plans</strong>
+                <span id="comparison-count">0 selected</span>
+            </div>
+            <button id="compare-plans-button" type="button">Compare selected</button>
+            <button id="clear-comparison-button" type="button" class="text-button">Clear</button>
+        </div>
+
+        <div class="plans-container" id="plans-container">
+            <!-- Plans will be loaded here dynamically by JavaScript -->
+        </div>
+
+    </section>
+
+    <section class="comparison-panel" id="comparison-panel" hidden>
+        <div class="section-intro">
+            <p class="small-heading">Plan comparison</p>
+            <h2>See your shortlist side by side.</h2>
+        </div>
+        <div id="comparison-table-container"></div>
+    </section>
+
+
+    <!-- Footer -->
+    <footer>
+
+        <h3>Barno Plans</h3>
+
+        <p>
+            House plans, architectural designs and custom solutions for clients worldwide.
+        </p>
+
+        <p>
+            © 2026 Barno Plans. All rights reserved.
+        </p>
+        <p class="legal-links">
+            <a href="privacy.html">Privacy</a>
+            <a href="terms.html">Terms</a>
+            <a href="refunds.html">Refund Policy</a>
+            <a href="disclaimer.html">Disclaimer</a>
+        </p>
+
+    </footer>
+
+    <button class="back-to-top" id="back-to-top" type="button" aria-label="Back to top">↑</button>
+
+
+    <script type="module" src="data/plans.js"></script>
+    <script type="module" src="script.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description" content="Browse practical house plans from Barno Plans, including two-, three-, and four-bedroom designs with digital PDF packages.">
+    <meta property="og:title" content="Barno Plans | House Plans & Designs">
+    <meta property="og:description" content="Explore practical house plans and choose a design for your next home.">
+    <meta property="og:type" content="website">
+
+    <title>Barno Plans | House Plans & Designs</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Navigation Bar -->
+    <header class="navbar">
+
+        <div class="brand" aria-label="Barno Plans home">
+            <svg class="brand-logo" viewBox="0 0 64 64" role="img" aria-label="Barno Plans logo">
+                <path class="roof-shape" d="M10 26L32 10L54 26V48C54 50.2 52.2 52 50 52H14C11.8 52 10 50.2 10 48V26Z"></path>
+                <path class="roof-line" d="M18 24L32 14L46 24"></path>
+                <text x="32" y="39" text-anchor="middle" class="brand-letter">B</text>
+            </svg>
+            <div class="brand-name">
+                <span>Barno</span>
+                <small>PLANS</small>
+            </div>
+        </div>
+
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="main-navigation">Menu</button>
+        <nav id="main-navigation">
+            <a href="index.html">Home</a>
+            <a href="plans.html">House Plans</a>
+            <a href="#about">About</a>
+            <a href="#reviews">Reviews</a>
+            <a href="#contact">Contact</a>
+        </nav>
+
+    </header>
+
+
+    <!-- Hero Section -->
+    <section class="hero">
+
+        <p class="small-heading">
+            Find a Home You'll Love
+        </p>
+
+        <h1>
+            Explore. Choose. Build.
+        </h1>
+
+        <p class="hero-text">
+            Your next home starts with a plan.
+        </p>
+
+        <div class="hero-buttons">
+            <a href="plans.html" class="button">
+                Browse House Plans
+            </a>
+
+            <a href="#contact" class="button secondary">
+                Custom Design
+            </a>
+        </div>
+
+    </section>
+
+
+    <!-- Bedroom Categories -->
+    <section class="categories">
+
+        <h2>Browse House Plans</h2>
+
+        <div class="category-buttons">
+
+            <a href="plans.html?bedrooms=1">1 Bedroom</a>
+            <a href="plans.html?bedrooms=2">2 Bedroom</a>
+            <a href="plans.html?bedrooms=3">3 Bedroom</a>
+            <a href="plans.html?bedrooms=4">4 Bedroom</a>
+            <a href="plans.html?bedrooms=5">5 Bedroom</a>
+
+        </div>
+
+    </section>
+
+
+    <!-- Featured Plans -->
+    <section class="featured">
+
+        <h2>Featured House Plans</h2>
+
+        <p>
+            Explore some of our popular house designs.
+        </p>
+
+        <div class="plans-container" id="featured-plans-container">
+            <!-- Plans will be loaded here dynamically by JavaScript -->
+        </div>
+
+    </section>
+
+
+    <section class="about-section" id="about">
+        <p class="small-heading">About Barno Plans</p>
+        <h2>Thoughtful plans for the way you want to live.</h2>
+        <p>Barno Plans provides practical, modern architectural house plans for homeowners, families, and property developers. We create clear designs that balance beauty, comfort, and efficient use of space, from the first idea to a plan ready for professional review and construction.</p>
+        <p>Based in Nairobi and Eldoret, Kenya, we serve homeowners, families, and property developers worldwide. Our services include house-plan design, floor plans, elevations, building sections, and custom design adjustments.</p>
+    </section>
+
+    <section class="trust-strip">
+        <div><strong>Clear pricing</strong><span>See the cost before you buy</span></div>
+        <div><strong>Digital delivery</strong><span>Receive your plan as a PDF</span></div>
+        <div><strong>Custom support</strong><span>Ask about changes to a design</span></div>
+    </section>
+
+    <section class="buyer-confidence">
+        <div class="section-intro">
+            <p class="small-heading">A clear process</p>
+            <h2>Everything you need to move forward.</h2>
+            <p>Choose a design, review the details, and receive a digital plan package after your payment is confirmed.</p>
+        </div>
+        <div class="confidence-grid">
+            <article>
+                <span class="step-number">01</span>
+                <h3>Choose your plan</h3>
+                <p>Compare bedrooms, bathrooms, floors, garage space, images, and pricing before making a decision.</p>
+            </article>
+            <article>
+                <span class="step-number">02</span>
+                <h3>Review the package</h3>
+                <p>Plan packages may include floor plans, elevations, sections, roof plans, dimensions, and PDF files as listed.</p>
+            </article>
+            <article>
+                <span class="step-number">03</span>
+                <h3>Build with confidence</h3>
+                <p>Have the design reviewed and adapted by a qualified professional for your site and local requirements.</p>
+            </article>
+        </div>
+    </section>
+
+    <section class="reviews-section" id="reviews">
+        <div class="section-intro">
+            <p class="small-heading">Client feedback</p>
+            <h2>Your experience matters.</h2>
+            <p>Barno Plans is building a collection of honest feedback from homeowners, families, and developers.</p>
+        </div>
+        <div class="reviews-grid">
+            <article class="review-card review-request reviews-empty">
+                <div class="review-stars" aria-hidden="true">★★★★★</div>
+                <strong>Be among the first to share your experience.</strong>
+                <p>Tell us what helped you choose your plan, how the package supported your next step, and what we can improve.</p>
+                <a href="mailto:barnoplans@gmail.com?subject=Barno%20Plans%20review">Share your review</a>
+            </article>
+        </div>
+    </section>
+
+    <section class="faq-section" id="faq">
+        <div class="section-intro">
+            <p class="small-heading">Before you choose</p>
+            <h2>Common questions, answered.</h2>
+            <p>Everything you need to know before reviewing or purchasing a digital plan package.</p>
+        </div>
+        <div class="faq-grid">
+            <details>
+                <summary>What do I receive after payment?</summary>
+                <p>You receive the PDF plan package listed on the selected plan page. Review the package details before purchasing.</p>
+            </details>
+            <details>
+                <summary>Can a plan be changed?</summary>
+                <p>Ask us about adjustments before purchasing. A qualified professional should review any changes for your site and local requirements.</p>
+            </details>
+            <details>
+                <summary>Are the plans ready for construction?</summary>
+                <p>Plans are design packages and may need local approval, structural work, and site-specific adaptation before construction.</p>
+            </details>
+            <details>
+                <summary>How do I ask a question?</summary>
+                <p>Contact Barno Plans by email, phone, or WhatsApp and include the plan name you are asking about.</p>
+            </details>
+        </div>
+    </section>
+
+    <!-- Custom Design Section -->
+    <section class="custom-design" id="contact">
+
+        <h2>Can't Find What You're Looking For?</h2>
+
+        <p>
+            We can create a house plan tailored to your requirements.
+        </p>
+
+        <a href="mailto:barnoplans@gmail.com?subject=Custom%20house%20plan" class="button">
+            Request Custom Design
+        </a>
+        <form class="contact-form" id="contact-form">
+            <label for="contact-name">Your name</label>
+            <input id="contact-name" name="name" type="text" required>
+            <label for="contact-email">Email address</label>
+            <input id="contact-email" name="email" type="email" required>
+            <label for="contact-message">How can we help?</label>
+            <textarea id="contact-message" name="message" rows="4" required></textarea>
+            <button class="button" type="submit">Send enquiry</button>
+        </form>
+        <p class="contact-details">
+            Questions? Email <a href="mailto:barnoplans@gmail.com">barnoplans@gmail.com</a>
+        </p>
+        <p class="contact-details">
+            Call <a href="tel:+254710304401">+254 710 304 401</a> or
+            <a href="https://wa.me/254710304401?text=Hello%20Barno%20Plans%2C%20I%20would%20like%20to%20ask%20about%20a%20house%20plan.">message us on WhatsApp</a>.
+        </p>
+        <p class="contact-details">
+            Follow us on <a href="https://web.facebook.com/profile.php?id=100093539746636" target="_blank" rel="noopener noreferrer">Facebook</a>.
+        </p>
+
+    </section>
+
+
+    <!-- Footer -->
+    <footer>
+
+        <h3>Barno Plans</h3>
+
+        <p>
+            House plans, architectural designs and custom solutions for clients worldwide.
+        </p>
+
+        <p>
+            © 2026 Barno Plans. All rights reserved.
+        </p>
+        <p class="legal-links">
+            <a href="privacy.html">Privacy</a>
+            <a href="terms.html">Terms</a>
+            <a href="refunds.html">Refund Policy</a>
+            <a href="disclaimer.html">Disclaimer</a>
+        </p>
+
+    </footer>
+
+    <a class="whatsapp-float" href="https://wa.me/254710304401?text=Hello%20Barno%20Plans%2C%20I%20would%20like%20to%20ask%20about%20a%20house%20plan." target="_blank" rel="noopener noreferrer" aria-label="Chat with Barno Plans on WhatsApp">
+        <span aria-hidden="true">WA</span>
+        <strong>Chat with us</strong>
+    </a>
+
+    <button class="back-to-top" id="back-to-top" type="button" aria-label="Back to top">↑</button>
+
+
+    <script type="module" src="data/plans.js"></script>
+    <script type="module" src="script.js"></script>
+
+</body>
+</html>
