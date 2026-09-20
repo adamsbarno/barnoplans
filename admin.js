@@ -5,6 +5,16 @@ const loginMessage = document.getElementById('admin-login-message');
 const addPlanForm = document.getElementById('admin-add-plan-form');
 const addPlanMessage = document.getElementById('admin-add-message');
 
+function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>'"]/g, character => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#39;',
+        '"': '&quot;'
+    }[character]));
+}
+
 function showDashboard(summary) {
     loginPanel.hidden = true;
     dashboard.hidden = false;
@@ -17,7 +27,7 @@ function showDashboard(summary) {
     `;
     document.getElementById('admin-plans').innerHTML = `
         <thead><tr><th>Plan</th><th>Category</th><th>Price</th><th>Action</th><th>PDF</th></tr></thead>
-        <tbody>${summary.plans.map(plan => `<tr><td>${plan.name}</td><td>${plan.category}</td><td><input class="admin-price-input" data-plan-id="${plan.id}" type="number" min="0" step="1" value="${plan.price}"></td><td><button class="admin-save-price" data-plan-id="${plan.id}" type="button">Save</button></td><td>${plan.pdf}</td></tr>`).join('')}</tbody>
+        <tbody>${summary.plans.map(plan => `<tr><td>${escapeHtml(plan.name)}</td><td>${escapeHtml(plan.category)}</td><td><input class="admin-price-input" data-plan-id="${escapeHtml(plan.id)}" type="number" min="0" step="1" value="${escapeHtml(plan.price)}"></td><td><button class="admin-save-price" data-plan-id="${escapeHtml(plan.id)}" type="button">Save</button></td><td>${escapeHtml(plan.pdf)}</td></tr>`).join('')}</tbody>
     `;
     document.querySelectorAll('.admin-save-price').forEach(button => {
         button.addEventListener('click', async () => {
@@ -34,7 +44,7 @@ function showDashboard(summary) {
     });
     document.getElementById('admin-orders').innerHTML = summary.orders.length ? `
         <thead><tr><th>Order</th><th>Plan</th><th>Amount</th><th>Status</th><th>Created</th></tr></thead>
-        <tbody>${summary.orders.map(order => `<tr><td>${order.orderId}</td><td>${order.planName}</td><td>KSh ${Number(order.amount).toLocaleString()}</td><td>${order.status}</td><td>${new Date(order.createdAt).toLocaleString()}</td></tr>`).join('')}</tbody>
+        <tbody>${summary.orders.map(order => `<tr><td>${escapeHtml(order.orderId)}</td><td>${escapeHtml(order.planName)}</td><td>KSh ${Number(order.amount).toLocaleString()}</td><td>${escapeHtml(order.status)}</td><td>${escapeHtml(new Date(order.createdAt).toLocaleString())}</td></tr>`).join('')}</tbody>
     ` : '<tbody><tr><td>No orders yet.</td></tr></tbody>';
 }
 
