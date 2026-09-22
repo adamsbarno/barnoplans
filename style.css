@@ -903,6 +903,22 @@ footer p {
 
 /* INCLUDED */
 
+.included-purchase-row {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 30px;
+
+    align-items: start;
+
+    margin-bottom: 30px;
+}
+
+.included-purchase-row .purchase-section {
+    margin-bottom: 0;
+}
+
 .included {
     border-top: 1px solid #ddd;
 
@@ -1278,6 +1294,12 @@ footer p {
         grid-template-columns: repeat(2, 1fr);
     }
 
+    .included-purchase-row {
+        grid-template-columns: 1fr;
+
+        gap: 20px;
+    }
+
     .thumbnail {
         height: 120px;
         font-size: 15px;
@@ -1406,6 +1428,39 @@ footer p {
     border: 1px solid #ccd6d3;
     border-radius: 6px;
     font: inherit;
+}
+
+.modal-content.mpesa-theme {
+    background: #ffffff;
+    border-top: 8px solid #1f9d55;
+}
+
+.mpesa-badge {
+    display: inline-block;
+    background: #1f9d55;
+    color: #ffffff;
+    font-weight: 800;
+    letter-spacing: 1px;
+    font-size: 13px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    margin-bottom: 12px;
+}
+
+.modal-content.mpesa-theme h2 {
+    color: #1f9d55;
+}
+
+.modal-content.mpesa-theme strong {
+    color: #1f9d55;
+}
+
+.mpesa-submit {
+    background: #1f9d55;
+}
+
+.mpesa-submit:hover {
+    background: #187c43;
 }
 
 
