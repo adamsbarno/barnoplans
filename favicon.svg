@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Barno Plans logo">
+    <rect width="64" height="64" rx="12" fill="#ffffff"></rect>
+    <path d="M10 26L32 10L54 26V48C54 50.2 52.2 52 50 52H14C11.8 52 10 50.2 10 48V26Z" fill="#f6d57a" stroke="#7d2335" stroke-width="2.5"></path>
+    <path d="M18 24L32 14L46 24" fill="none" stroke="#7d2335" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+    <text x="32" y="39" text-anchor="middle" font-family="Arial, sans-serif" font-weight="800" font-size="26" fill="#7d2335">B</text>
+</svg>
