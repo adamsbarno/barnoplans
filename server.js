@@ -62,18 +62,54 @@ const plans = new Map(getCatalogPlans().map((plan) => [
 
 function saveOrders() {
     fs.writeFileSync(ordersFile, JSON.stringify([...orders.values()], null, 2));
+    syncFileToGitHub('data/orders.json', JSON.stringify([...orders.values()], null, 2));
 }
 
 function saveCatalogOverrides() {
     fs.writeFileSync(catalogOverridesFile, JSON.stringify(catalogOverrides, null, 2));
+    syncFileToGitHub('data/catalog-overrides.json', JSON.stringify(catalogOverrides, null, 2));
 }
 
 function saveCatalogAdditions() {
     fs.writeFileSync(catalogAdditionsFile, JSON.stringify(catalogAdditions, null, 2));
+    syncFileToGitHub('data/catalog-additions.json', JSON.stringify(catalogAdditions, null, 2));
 }
 
 function saveContactSubmissions() {
     fs.writeFileSync(contactsFile, JSON.stringify(contactSubmissions, null, 2));
+    syncFileToGitHub('data/contact-submissions.json', JSON.stringify(contactSubmissions, null, 2));
+}
+
+async function syncFileToGitHub(repoPath, content) {
+    const token = process.env.GITHUB_TOKEN;
+    const repo = process.env.GITHUB_REPO;
+    if (!token || !repo) return;
+    const branch = process.env.GITHUB_BRANCH || 'main';
+    const apiUrl = `https://api.github.com/repos/${repo}/contents/${repoPath}`;
+    const headers = {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/vnd.github+json',
+        'Content-Type': 'application/json'
+    };
+    try {
+        const existing = await fetch(`${apiUrl}?ref=${branch}`, { headers });
+        const existingData = existing.ok ? await existing.json() : null;
+        const response = await fetch(apiUrl, {
+            method: 'PUT',
+            headers,
+            body: JSON.stringify({
+                message: `Update ${repoPath} from admin dashboard`,
+                content: Buffer.from(content, 'utf8').toString('base64'),
+                sha: existingData?.sha,
+                branch
+            })
+        });
+        if (!response.ok) {
+            console.error(`GitHub sync failed for ${repoPath}:`, response.status, await response.text());
+        }
+    } catch (error) {
+        console.error(`GitHub sync error for ${repoPath}:`, error.message);
+    }
 }
 
 app.disable('x-powered-by');
