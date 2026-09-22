@@ -71,6 +71,8 @@
 
             </div>
 
+            <p class="thumbnail-hint">Tap a thumbnail to view it larger.</p>
+
         </div>
 
 
@@ -96,6 +98,34 @@
             <div class="product-price">
 
                 KSh 2,000
+
+            </div>
+
+            <p class="trust-note">🔒 Secure payment &bull; Instant PDF delivery after confirmation</p>
+
+
+            <!-- Included -->
+            <div class="included">
+
+                <h2>
+                    What's Included
+                </h2>
+
+                <ul>
+
+                    <li>Floor plans</li>
+
+                    <li>Elevations</li>
+
+                    <li>Building sections</li>
+
+                    <li>Roof plan</li>
+
+                    <li>Detailed dimensions</li>
+
+                    <li>Digital PDF files</li>
+
+                </ul>
 
             </div>
 
@@ -125,34 +155,10 @@
             <div class="purchase-section">
 
                 <button class="manual-payment-button" type="button">
-                    Buy This Plan - Pay Manually
+                    Buy This Plan
                 </button>
 
-            </div>
-
-
-            <!-- Included -->
-            <div class="included">
-
-                <h2>
-                    What's Included
-                </h2>
-
-                <ul>
-
-                    <li>Floor plans</li>
-
-                    <li>Elevations</li>
-
-                    <li>Building sections</li>
-
-                    <li>Roof plan</li>
-
-                    <li>Detailed dimensions</li>
-
-                    <li>Digital PDF files</li>
-
-                </ul>
+                <p class="purchase-hint">You'll send your M-Pesa payment and confirm your transaction code so we can send your PDF right away.</p>
 
             </div>
 
@@ -160,6 +166,11 @@
         </div>
 
     </section>
+
+    <div class="mobile-buy-bar" id="mobile-buy-bar">
+        <div class="mobile-buy-bar-price" id="mobile-buy-bar-price"></div>
+        <button type="button" id="mobile-buy-bar-button">Buy This Plan</button>
+    </div>
 
 
     <!-- Description -->
@@ -266,6 +277,25 @@
 
     <script type="module" src="data/plans.js"></script>
     <script type="module" src="script.js"></script>
+
+    <script type="module">
+        const priceEl = document.querySelector('.product-price');
+        const barPrice = document.getElementById('mobile-buy-bar-price');
+        const barButton = document.getElementById('mobile-buy-bar-button');
+
+        function syncMobileBuyBar() {
+            if (priceEl && barPrice) barPrice.textContent = priceEl.textContent.trim();
+        }
+
+        barButton?.addEventListener('click', () => {
+            document.querySelector('.manual-payment-button')?.click();
+        });
+
+        if (priceEl) {
+            new MutationObserver(syncMobileBuyBar).observe(priceEl, { childList: true, characterData: true, subtree: true });
+        }
+        syncMobileBuyBar();
+    </script>
 
 </body>
 
