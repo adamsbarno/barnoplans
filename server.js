@@ -86,9 +86,9 @@ const contactLimiter = rateLimit({ windowMs: 60 * 60 * 1000, limit: 20, standard
 app.use('/api', apiLimiter);
 app.use('/data', (request, response) => response.status(404).json({ error: 'Not found' }));
 app.use('/pdfs', (request, response) => response.status(404).json({ error: 'PDF access requires a verified payment' }));
+app.use('/images', express.static(path.join(__dirname, 'images'), { maxAge: '7d' }));
 app.use(express.static(__dirname, {
-    fallthrough: true,
-    maxAge: '7d'
+    fallthrough: true
 }));
 
 app.get('/api/catalog', (request, response) => {
