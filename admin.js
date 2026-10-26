@@ -4,6 +4,7 @@ const loginForm = document.getElementById('admin-login-form');
 const loginMessage = document.getElementById('admin-login-message');
 const addPlanForm = document.getElementById('admin-add-plan-form');
 const addPlanMessage = document.getElementById('admin-add-message');
+const pesapalMessage = document.getElementById('admin-pesapal-message');
 
 function escapeHtml(value) {
     return String(value ?? '').replace(/[&<>'"]/g, character => ({
@@ -76,6 +77,24 @@ document.getElementById('admin-logout').addEventListener('click', async () => {
     dashboard.hidden = true;
     loginPanel.hidden = false;
     loginForm.reset();
+});
+
+document.getElementById('admin-register-pesapal-ipn').addEventListener('click', async event => {
+    const button = event.currentTarget;
+    button.disabled = true;
+    pesapalMessage.textContent = 'Registering the notification URL with Pesapal...';
+    try {
+        const response = await fetch('/api/admin/pesapal/register-ipn', { method: 'POST' });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'Could not register the URL.');
+        pesapalMessage.textContent = result.alreadyRegistered
+            ? `Pesapal ${result.environment} IPN is already configured in Render.`
+            : `Registration complete for ${result.environment}. In Render, set PESAPAL_IPN_ID to ${result.ipnId} and PESAPAL_IPN_ENVIRONMENT to ${result.environment}.`;
+    } catch (error) {
+        pesapalMessage.textContent = error.message;
+    } finally {
+        button.disabled = false;
+    }
 });
 
 addPlanForm.addEventListener('submit', async event => {

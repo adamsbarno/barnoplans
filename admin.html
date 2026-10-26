@@ -33,6 +33,12 @@
                 <button class="button secondary" id="admin-logout" type="button">Sign out</button>
             </header>
             <div class="admin-stats" id="admin-stats"></div>
+            <section class="admin-payment-setup">
+                <h2>Pesapal checkout setup</h2>
+                <p>After adding your Pesapal credentials in Render, register the notification URL once and copy its ID back to Render.</p>
+                <button class="button secondary" id="admin-register-pesapal-ipn" type="button">Register Pesapal notification URL</button>
+                <p class="admin-message" id="admin-pesapal-message" role="status"></p>
+            </section>
             <details class="admin-add-plan">
                 <summary>Add a new house plan</summary>
                 <form id="admin-add-plan-form" enctype="multipart/form-data">

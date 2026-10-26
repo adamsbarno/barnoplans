@@ -26,6 +26,20 @@ services:
         sync: false
       - key: MPESA_CALLBACK_URL
         sync: false
+      - key: PESAPAL_CONSUMER_KEY
+        sync: false
+      - key: PESAPAL_CONSUMER_SECRET
+        sync: false
+      - key: PESAPAL_IPN_ID
+        sync: false
+      - key: PESAPAL_IPN_ENVIRONMENT
+        sync: false
+      - key: PESAPAL_ENVIRONMENT
+        value: sandbox
+      - key: PUBLIC_APP_URL
+        sync: false
+      - key: DOWNLOAD_TOKEN_SECRET
+        sync: false
       - key: GITHUB_TOKEN
         sync: false
       - key: GITHUB_REPO

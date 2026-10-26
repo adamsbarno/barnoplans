@@ -13,8 +13,9 @@ dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
-const payments = new Map();
 const adminSessions = new Map();
+let pesapalToken = null;
+let pesapalTokenExpiresAt = 0;
 const ordersFile = path.join(__dirname, 'data', 'orders.json');
 const catalogOverridesFile = path.join(__dirname, 'data', 'catalog-overrides.json');
 const catalogAdditionsFile = path.join(__dirname, 'data', 'catalog-additions.json');
@@ -269,10 +270,6 @@ app.post('/api/admin/plans', requireAdmin, upload.fields([
     return response.status(201).json(plan);
 });
 
-function validatePhone(phoneNumber) {
-    return typeof phoneNumber === 'string' && /^2547\d{8}$/.test(phoneNumber);
-}
-
 function normalizePhoneNumber(phoneNumber) {
     if (typeof phoneNumber !== 'string') return null;
     const digits = phoneNumber.replace(/\D/g, '');
@@ -281,118 +278,235 @@ function normalizePhoneNumber(phoneNumber) {
     return null;
 }
 
-async function getAccessToken() {
-    const credentials = Buffer.from(
-        `${process.env.MPESA_CONSUMER_KEY}:${process.env.MPESA_CONSUMER_SECRET}`
-    ).toString('base64');
-
-    const response = await fetch(
-        'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials',
-        { headers: { Authorization: `Basic ${credentials}` } }
-    );
-
-    if (!response.ok) {
-        throw new Error(`OAuth request failed with status ${response.status}`);
-    }
-
-    return (await response.json()).access_token;
+function getPesapalBaseUrl() {
+    return getPesapalEnvironment() === 'live'
+        ? 'https://pay.pesapal.com/v3'
+        : 'https://cybqa.pesapal.com/pesapalv3';
 }
 
-app.post('/api/mpesa/stk-push', async (request, response) => {
+function getPesapalEnvironment() {
+    return process.env.PESAPAL_ENVIRONMENT === 'live' ? 'live' : 'sandbox';
+}
+
+function getPublicAppUrl() {
+    const baseUrl = process.env.PUBLIC_APP_URL || process.env.RENDER_EXTERNAL_URL;
+    return baseUrl ? baseUrl.replace(/\/$/, '') : null;
+}
+
+function hasPesapalCredentials() {
+    return Boolean(process.env.PESAPAL_CONSUMER_KEY && process.env.PESAPAL_CONSUMER_SECRET);
+}
+
+async function getPesapalToken() {
+    if (!hasPesapalCredentials()) throw new Error('Pesapal credentials are not configured');
+    if (pesapalToken && Date.now() < pesapalTokenExpiresAt) return pesapalToken;
+
+    const response = await fetch(`${getPesapalBaseUrl()}/api/Auth/RequestToken`, {
+        method: 'POST',
+        headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            consumer_key: process.env.PESAPAL_CONSUMER_KEY,
+            consumer_secret: process.env.PESAPAL_CONSUMER_SECRET
+        })
+    });
+    const result = await response.json();
+    if (!response.ok || !result.token) throw new Error('Pesapal authentication failed');
+
+    pesapalToken = result.token;
+    pesapalTokenExpiresAt = Date.now() + 4 * 60 * 1000;
+    return pesapalToken;
+}
+
+app.post('/api/admin/pesapal/register-ipn', requireAdmin, async (request, response) => {
+    const environment = getPesapalEnvironment();
+    if (process.env.PESAPAL_IPN_ID && process.env.PESAPAL_IPN_ENVIRONMENT === environment) {
+        return response.json({ ipnId: process.env.PESAPAL_IPN_ID, environment, alreadyRegistered: true });
+    }
+    const publicUrl = getPublicAppUrl();
+    if (!publicUrl || !hasPesapalCredentials()) {
+        return response.status(503).json({ error: 'Set the public app URL and Pesapal credentials in Render first.' });
+    }
+
     try {
-        const { planId } = request.body;
-        const phoneNumber = normalizePhoneNumber(request.body.phoneNumber);
-        const plan = plans.get(Number(planId));
+        const token = await getPesapalToken();
+        const resultResponse = await fetch(`${getPesapalBaseUrl()}/api/URLSetup/RegisterIPN`, {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                url: `${publicUrl}/api/pesapal/ipn`,
+                ipn_notification_type: 'GET'
+            })
+        });
+        const result = await resultResponse.json();
+        if (!resultResponse.ok || !result.ipn_id) {
+            return response.status(502).json({ error: 'Pesapal could not register the notification URL.' });
+        }
+        return response.status(201).json({ ipnId: result.ipn_id, environment, alreadyRegistered: false });
+    } catch (error) {
+        console.error('Pesapal IPN registration failed:', error.message);
+        return response.status(502).json({ error: 'Could not register the Pesapal notification URL.' });
+    }
+});
 
-        if (!plan || !validatePhone(phoneNumber)) {
-            return response.status(400).json({ error: 'Invalid plan or phone number' });
+app.post('/api/pesapal/orders', async (request, response) => {
+    const planId = Number(request.body?.planId);
+    const phoneNumber = normalizePhoneNumber(request.body?.phoneNumber);
+    const plan = plans.get(planId);
+    const publicUrl = getPublicAppUrl();
+
+    if (!plan || !phoneNumber) {
+        return response.status(400).json({ error: 'Choose a valid plan and enter a Kenyan mobile number.' });
+    }
+    if (!hasPesapalCredentials() || !process.env.PESAPAL_IPN_ID ||
+        process.env.PESAPAL_IPN_ENVIRONMENT !== getPesapalEnvironment() || !publicUrl ||
+        !process.env.DOWNLOAD_TOKEN_SECRET || process.env.DOWNLOAD_TOKEN_SECRET.length < 32) {
+        return response.status(503).json({ error: 'Online payments are not configured yet. Please use the manual M-Pesa option.' });
+    }
+
+    try {
+        const token = await getPesapalToken();
+        const merchantReference = `BP-${planId}-${crypto.randomUUID()}`;
+        const returnUrl = `${publicUrl}/payment-return.html`;
+        const resultResponse = await fetch(`${getPesapalBaseUrl()}/api/Transactions/SubmitOrderRequest`, {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                id: merchantReference,
+                currency: 'KES',
+                amount: plan.price,
+                description: plan.name.slice(0, 100),
+                callback_url: returnUrl,
+                cancellation_url: returnUrl,
+                redirect_mode: 'TOP_WINDOW',
+                notification_id: process.env.PESAPAL_IPN_ID,
+                billing_address: {
+                    phone_number: phoneNumber,
+                    country_code: 'KE'
+                }
+            })
+        });
+        const result = await resultResponse.json();
+        if (!resultResponse.ok || !result.redirect_url || !result.order_tracking_id) {
+            console.error('Pesapal order request rejected:', result.error?.message || result.message || 'No redirect URL');
+            return response.status(502).json({ error: 'Pesapal could not start checkout. Please try again or use manual M-Pesa.' });
         }
 
-        const timestamp = new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 14);
-        const password = Buffer.from(
-            `${process.env.MPESA_SHORTCODE}${process.env.MPESA_PASSKEY}${timestamp}`
-        ).toString('base64');
-        const accessToken = await getAccessToken();
-
-        const mpesaResponse = await fetch(
-            'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest',
-            {
-                method: 'POST',
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    BusinessShortCode: process.env.MPESA_SHORTCODE,
-                    Password: password,
-                    Timestamp: timestamp,
-                    TransactionType: 'CustomerPayBillOnline',
-                    Amount: plan.price,
-                    PartyA: phoneNumber,
-                    PartyB: process.env.MPESA_SHORTCODE,
-                    PhoneNumber: phoneNumber,
-                    CallBackURL: process.env.MPESA_CALLBACK_URL,
-                    AccountReference: `PLAN-${planId}`,
-                    TransactionDesc: plan.name
-                })
-            }
-        );
-        const result = await mpesaResponse.json();
-
-        if (!mpesaResponse.ok || result.ResponseCode !== '0') {
-            return response.status(502).json({ error: result.errorMessage || result.ResponseDescription || 'STK Push failed' });
-        }
-
-        const downloadToken = crypto.randomUUID();
-        const orderId = `BP-${Date.now()}-${planId}`;
-        orders.set(orderId, {
-            orderId,
-            planId: Number(planId),
+        orders.set(merchantReference, {
+            orderId: merchantReference,
+            planId,
             planName: plan.name,
             amount: plan.price,
+            currency: 'KES',
             phoneNumber,
+            paymentProvider: 'pesapal',
+            pesapalTrackingId: result.order_tracking_id,
             status: 'pending',
             createdAt: new Date().toISOString()
         });
         saveOrders();
-        payments.set(result.CheckoutRequestID, {
-            orderId,
-            planId: Number(planId),
-            phoneNumber,
-            downloadToken,
-            paid: false,
-            createdAt: Date.now()
-        });
-
-        return response.json({ checkoutRequestId: result.CheckoutRequestID, downloadToken });
+        return response.json({ redirectUrl: result.redirect_url });
     } catch (error) {
-        console.error('M-Pesa STK Push error:', error.message);
-        return response.status(500).json({ error: 'Could not start M-Pesa payment' });
+        console.error('Pesapal checkout error:', error.message);
+        return response.status(502).json({ error: 'Could not start Pesapal checkout. Please try again or use manual M-Pesa.' });
     }
 });
 
-app.post('/api/mpesa/callback', (request, response) => {
-    const callback = request.body?.Body?.stkCallback;
-    const payment = callback && payments.get(callback.CheckoutRequestID);
+async function refreshPesapalOrder(merchantReference, trackingId) {
+    const order = orders.get(merchantReference);
+    if (!order || order.paymentProvider !== 'pesapal' || order.pesapalTrackingId !== trackingId) {
+        throw new Error('Payment order not found');
+    }
 
-    if (payment && callback.ResultCode === 0) {
-        payment.paid = true;
-        payment.paidAt = Date.now();
-        const order = orders.get(payment.orderId);
-        if (order) {
-            order.status = 'paid';
-            order.paidAt = new Date().toISOString();
+    const token = await getPesapalToken();
+    const statusUrl = new URL(`${getPesapalBaseUrl()}/api/Transactions/GetTransactionStatus`);
+    statusUrl.searchParams.set('orderTrackingId', trackingId);
+    const resultResponse = await fetch(statusUrl, {
+        headers: { Accept: 'application/json', Authorization: `Bearer ${token}` }
+    });
+    const result = await resultResponse.json();
+    if (!resultResponse.ok) throw new Error('Pesapal status check failed');
+
+    const paymentCompleted = Number(result.status_code) === 1 &&
+        String(result.payment_status_description).toLowerCase() === 'completed' &&
+        result.merchant_reference === merchantReference &&
+        String(result.currency).toUpperCase() === order.currency &&
+        Number(result.amount) === Number(order.amount);
+
+    if (paymentCompleted && order.status !== 'paid') {
+        order.status = 'paid';
+        order.paidAt = new Date().toISOString();
+        order.paymentMethod = result.payment_method || null;
+        order.confirmationCode = result.confirmation_code || null;
+        saveOrders();
+    } else if (!paymentCompleted && Number(result.status_code) >= 2) {
+        const status = Number(result.status_code) === 3 ? 'reversed' : 'failed';
+        if (order.status !== status) {
+            order.status = status;
             saveOrders();
         }
     }
+    return order;
+}
 
-    return response.json({ ResultCode: 0, ResultDesc: 'Accepted' });
-});
+async function handlePesapalIpn(request, response) {
+    const notification = { ...request.query, ...(request.body || {}) };
+    const trackingId = String(notification.OrderTrackingId || '');
+    const merchantReference = String(notification.OrderMerchantReference || '');
+    if (!trackingId || !merchantReference) {
+        return response.status(400).json({ orderNotificationType: 'IPNCHANGE', status: 400 });
+    }
 
-app.get('/api/mpesa/status/:checkoutRequestId', (request, response) => {
-    const payment = payments.get(request.params.checkoutRequestId);
-    if (!payment) return response.status(404).json({ error: 'Payment not found' });
-    return response.json({ paid: payment.paid, orderId: payment.orderId });
+    try {
+        await refreshPesapalOrder(merchantReference, trackingId);
+        return response.json({
+            orderNotificationType: 'IPNCHANGE',
+            orderTrackingId: trackingId,
+            orderMerchantReference: merchantReference,
+            status: 200
+        });
+    } catch (error) {
+        console.error('Pesapal IPN processing failed:', error.message);
+        return response.status(500).json({
+            orderNotificationType: 'IPNCHANGE',
+            orderTrackingId: trackingId,
+            orderMerchantReference: merchantReference,
+            status: 500
+        });
+    }
+}
+
+app.get('/api/pesapal/ipn', handlePesapalIpn);
+app.post('/api/pesapal/ipn', handlePesapalIpn);
+
+app.get('/api/pesapal/status', async (request, response) => {
+    const merchantReference = String(request.query.merchantReference || '');
+    const trackingId = String(request.query.trackingId || '');
+    if (!merchantReference || !trackingId) {
+        return response.status(400).json({ error: 'Payment reference is incomplete.' });
+    }
+
+    try {
+        const order = await refreshPesapalOrder(merchantReference, trackingId);
+        const result = { status: order.status, planName: order.planName };
+        if (order.status === 'paid') {
+            const expiresAt = Date.now() + 15 * 60 * 1000;
+            const payload = `${merchantReference}.${expiresAt}`;
+            const signature = crypto.createHmac('sha256', process.env.DOWNLOAD_TOKEN_SECRET).update(payload).digest('hex');
+            result.downloadUrl = `/api/download/${encodeURIComponent(merchantReference)}/${expiresAt}.${signature}`;
+        }
+        return response.json(result);
+    } catch (error) {
+        console.error('Pesapal payment status check failed:', error.message);
+        return response.status(502).json({ error: 'Could not verify payment yet. Please retry shortly.' });
+    }
 });
 
 app.use((error, request, response, next) => {
@@ -407,14 +521,19 @@ app.use((error, request, response, next) => {
 });
 
 app.get('/api/download/:planId/:downloadToken', (request, response) => {
-    const payment = [...payments.values()].find(item =>
-        item.planId === Number(request.params.planId) &&
-        item.downloadToken === request.params.downloadToken &&
-        item.paid
-    );
-    const plan = plans.get(Number(request.params.planId));
+    const merchantReference = request.params.planId;
+    const order = orders.get(merchantReference);
+    const plan = order && order.status === 'paid' ? plans.get(order.planId) : null;
+    const [expiresAt, suppliedSignature] = request.params.downloadToken.split('.');
+    const payload = `${merchantReference}.${expiresAt}`;
+    const expectedSignature = crypto.createHmac('sha256', process.env.DOWNLOAD_TOKEN_SECRET || '').update(payload).digest('hex');
+    const expectedBuffer = Buffer.from(expectedSignature);
+    const suppliedBuffer = Buffer.from(suppliedSignature || '');
+    const validSignature = suppliedBuffer.length === expectedBuffer.length && crypto.timingSafeEqual(suppliedBuffer, expectedBuffer);
 
-    if (!payment || !plan) return response.status(403).json({ error: 'Payment not verified' });
+    if (!plan || !validSignature || !Number.isFinite(Number(expiresAt)) || Number(expiresAt) < Date.now()) {
+        return response.status(403).json({ error: 'Payment not verified or download link expired.' });
+    }
 
     const filePath = path.join(__dirname, 'pdfs', plan.pdf);
     if (!fs.existsSync(filePath)) return response.status(404).json({ error: 'Plan PDF is not available yet' });

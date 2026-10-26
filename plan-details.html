@@ -137,11 +137,15 @@
             <!-- Purchase -->
             <div class="purchase-section">
 
+                <button class="buy-button" type="button">
+                    Pay securely with Pesapal
+                </button>
+
                 <button class="manual-payment-button" type="button">
                     Buy This Plan via M-Pesa
                 </button>
 
-                <p class="purchase-hint">You'll send your M-Pesa payment and confirm your transaction code so we can send your PDF right away.</p>
+                <p class="purchase-hint">Pay through Pesapal, or choose manual M-Pesa and send your transaction code for confirmation.</p>
 
             </div>
 
@@ -175,7 +179,7 @@
 
     <div class="mobile-buy-bar" id="mobile-buy-bar">
         <div class="mobile-buy-bar-price" id="mobile-buy-bar-price"></div>
-        <button type="button" id="mobile-buy-bar-button">Buy via M-Pesa</button>
+        <button type="button" id="mobile-buy-bar-button">Pay with Pesapal</button>
     </div>
 
 
@@ -243,26 +247,6 @@
         </div>
     </div>
 
-    <!-- M-Pesa Payment Modal -->
-    <div id="mpesa-modal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2>M-Pesa Payment</h2>
-            <p>Complete your payment via M-Pesa</p>
-            <div class="payment-info">
-                <p><strong>Plan:</strong> <span id="modal-plan-name"></span></p>
-                <p><strong>Amount:</strong> KSh <span id="modal-plan-price"></span></p>
-                <p><strong>Phone:</strong> <span id="modal-phone"></span></p>
-            </div>
-            <p style="color: #666; margin-top: 15px; font-size: 14px;">
-                An M-Pesa prompt will be sent to your phone. Please enter your M-Pesa PIN to complete the payment.
-            </p>
-            <button id="confirm-payment" class="button" style="width: 100%; margin-top: 20px;">
-                I've Completed Payment
-            </button>
-        </div>
-    </div>
-
     <div id="manual-payment-modal" class="modal" style="display: none;">
         <div class="modal-content mpesa-theme">
             <button class="close-modal manual-payment-close" type="button" aria-label="Close manual payment form">&times;</button>
@@ -295,7 +279,7 @@
         }
 
         barButton?.addEventListener('click', () => {
-            document.querySelector('.manual-payment-button')?.click();
+            document.querySelector('.buy-button')?.click();
         });
 
         if (priceEl) {

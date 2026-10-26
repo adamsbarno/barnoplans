@@ -403,7 +403,7 @@ function loadPlanDetails(plan) {
         buyButton.setAttribute('data-plan-name', plan.name);
         buyButton.setAttribute('data-plan-price', plan.price);
         buyButton.addEventListener('click', function() {
-            buyPlanWithMpesa(plan);
+            buyPlanWithPesapal(plan);
         });
     }
 
@@ -516,20 +516,18 @@ function setupThumbnailGallery(plan) {
     });
 }
 
-// M-Pesa Payment Integration
-function buyPlanWithMpesa(plan) {
-    const enteredNumber = prompt('Enter your M-Pesa phone number (07xxxxxxxx or 2547xxxxxxxx):', '07');
+// Pesapal checkout
+function buyPlanWithPesapal(plan) {
+    const enteredNumber = prompt('Enter your phone number for Pesapal checkout (07xxxxxxxx or 2547xxxxxxxx):', '07');
+    if (enteredNumber === null) return;
     const phoneNumber = normalizePhoneNumber(enteredNumber);
-    
-    if (!phoneNumber) return;
-    
-    // Validate phone number format
+
     if (!phoneNumber) {
         alert('Please enter a valid Kenyan phone number.');
         return;
     }
-    
-    startMpesaPayment(plan, phoneNumber);
+
+    startPesapalPayment(plan, phoneNumber);
 }
 
 function normalizePhoneNumber(phoneNumber) {
@@ -540,83 +538,28 @@ function normalizePhoneNumber(phoneNumber) {
     return null;
 }
 
-async function startMpesaPayment(plan, phoneNumber) {
+async function startPesapalPayment(plan, phoneNumber) {
     const buyButton = document.querySelector('.buy-button');
     if (buyButton) {
         buyButton.disabled = true;
-        buyButton.textContent = 'Sending prompt...';
+        buyButton.textContent = 'Opening secure checkout...';
     }
 
     try {
-        const response = await fetch('/api/mpesa/stk-push', {
+        const response = await fetch('/api/pesapal/orders', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ planId: plan.id, phoneNumber })
         });
         const result = await response.json();
         if (!response.ok) throw new Error(result.error || 'Payment could not start');
-
-        showMpesaModal(plan, phoneNumber, result.checkoutRequestId, result.downloadToken);
+        window.location.assign(result.redirectUrl);
     } catch (error) {
         alert(error.message);
         if (buyButton) {
             buyButton.disabled = false;
-            buyButton.textContent = 'Buy This Plan';
+            buyButton.textContent = 'Pay securely with Pesapal';
         }
-    }
-}
-
-// Show M-Pesa Payment Modal
-function showMpesaModal(plan, phoneNumber, checkoutRequestId, downloadToken) {
-    const modal = document.getElementById('mpesa-modal');
-    if (!modal) return;
-    
-    document.getElementById('modal-plan-name').textContent = plan.name;
-    document.getElementById('modal-plan-price').textContent = plan.price.toLocaleString();
-    document.getElementById('modal-phone').textContent = phoneNumber;
-    
-    modal.style.display = 'block';
-    
-    // Close modal button
-    const closeBtn = document.querySelector('.close-modal');
-    closeBtn.onclick = function() {
-        modal.style.display = 'none';
-    };
-    
-    // Confirm payment button
-    const confirmBtn = document.getElementById('confirm-payment');
-    confirmBtn.onclick = function() {
-        checkPaymentStatus(plan, checkoutRequestId, downloadToken);
-    };
-    
-    // Close modal when clicking outside
-    modal.onclick = function(event) {
-        if (event.target === modal) {
-            modal.style.display = 'none';
-        }
-    };
-}
-
-async function checkPaymentStatus(plan, checkoutRequestId, downloadToken) {
-    const confirmBtn = document.getElementById('confirm-payment');
-    confirmBtn.textContent = 'Checking payment...';
-    confirmBtn.disabled = true;
-
-    try {
-        const response = await fetch(`/api/mpesa/status/${checkoutRequestId}`);
-        const result = await response.json();
-        if (!response.ok || !result.paid) {
-            throw new Error('Payment is not confirmed yet. Complete the prompt on your phone, then try again.');
-        }
-        const link = document.createElement('a');
-        link.href = `/api/download/${plan.id}/${downloadToken}`;
-        link.download = `${plan.name}.pdf`;
-        link.click();
-        document.getElementById('mpesa-modal').style.display = 'none';
-    } catch (error) {
-        alert(error.message);
-        confirmBtn.textContent = 'I\'ve Completed Payment';
-        confirmBtn.disabled = false;
     }
 }
 

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Payment status | Barno Plans</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main class="admin-shell">
+        <section class="admin-login" style="margin: 5rem auto;">
+            <p class="small-heading">Barno Plans</p>
+            <h1>Checking your payment</h1>
+            <p id="payment-message" role="status" aria-live="polite">Please wait while we confirm the payment with Pesapal.</p>
+            <div id="payment-download"></div>
+            <p><a href="plans.html">Return to house plans</a></p>
+        </section>
+    </main>
+    <script>
+        const query = new URLSearchParams(window.location.search);
+        const trackingId = query.get('OrderTrackingId');
+        const merchantReference = query.get('OrderMerchantReference');
+        const message = document.getElementById('payment-message');
+        const download = document.getElementById('payment-download');
+        let attempts = 0;
+
+        async function checkPayment() {
+            if (!trackingId || !merchantReference) {
+                message.textContent = 'Payment was not completed. You can return to the plans and try again.';
+                return;
+            }
+
+            try {
+                const queryString = new URLSearchParams({ trackingId, merchantReference });
+                const response = await fetch(`/api/pesapal/status?${queryString}`);
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'We could not check the payment yet.');
+
+                if (result.status === 'paid' && result.downloadUrl) {
+                    message.textContent = 'Payment confirmed. Your plan PDF is ready.';
+                    const link = document.createElement('a');
+                    link.className = 'button';
+                    link.href = result.downloadUrl;
+                    link.textContent = 'Download your plan PDF';
+                    download.replaceChildren(link);
+                    return;
+                }
+                if (result.status === 'failed' || result.status === 'reversed') {
+                    message.textContent = `Pesapal reports this payment as ${result.status}. If you believe this is a mistake, contact Barno Plans.`;
+                    return;
+                }
+                attempts += 1;
+                message.textContent = attempts < 12
+                    ? 'Payment is still processing. We will check again shortly.'
+                    : 'Payment is still processing. Refresh this page in a moment to check again.';
+                if (attempts < 12) window.setTimeout(checkPayment, 5000);
+            } catch (error) {
+                message.textContent = `${error.message} Refresh this page to retry.`;
+            }
+        }
+
+        checkPayment();
+    </script>
+</body>
+</html>
