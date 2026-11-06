@@ -407,40 +407,13 @@ function loadPlanDetails(plan) {
         });
     }
 
-    const manualPaymentButton = document.querySelector('.manual-payment-button');
-    const manualPaymentModal = document.getElementById('manual-payment-modal');
-    const manualPaymentForm = document.getElementById('manual-payment-form');
-    const manualPaymentClose = document.querySelector('.manual-payment-close');
-
-    if (manualPaymentButton && manualPaymentModal && manualPaymentForm) {
-        manualPaymentButton.addEventListener('click', function() {
-            document.getElementById('manual-plan-name').value = plan.name;
-            manualPaymentModal.style.display = 'block';
-        });
-
-        manualPaymentClose?.addEventListener('click', function() {
-            manualPaymentModal.style.display = 'none';
-        });
-
-        manualPaymentForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-            const customerName = document.getElementById('manual-customer-name').value.trim();
-            const customerPhone = document.getElementById('manual-customer-phone').value.trim();
-            const transactionCode = document.getElementById('manual-transaction-code').value.trim().toUpperCase();
-            const message = `Hello Barno Plans, I paid for ${plan.name} (KSh ${plan.price.toLocaleString()}). Name: ${customerName}. Phone: ${customerPhone}. M-Pesa code: ${transactionCode}. Please confirm my payment and send the PDF.`;
-            window.open(`https://wa.me/254710304401?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
-            manualPaymentModal.style.display = 'none';
-            manualPaymentForm.reset();
-        });
-    }
-    
     // Add preview PDF link
     const previewBtn = document.querySelector('.custom-button');
     if (previewBtn) {
         previewBtn.innerHTML = 'PDF after payment';
         previewBtn.onclick = function(e) {
             e.preventDefault();
-            alert('The PDF download becomes available after your M-Pesa payment is confirmed.');
+            alert('The PDF download becomes available after your Pesapal payment is confirmed.');
         };
     }
 }
