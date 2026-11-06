@@ -28,19 +28,32 @@ function showDashboard(summary) {
     `;
     document.getElementById('admin-plans').innerHTML = `
         <thead><tr><th>Plan</th><th>Category</th><th>Price</th><th>Action</th><th>PDF</th></tr></thead>
-        <tbody>${summary.plans.map(plan => `<tr><td>${escapeHtml(plan.name)}</td><td>${escapeHtml(plan.category)}</td><td><input class="admin-price-input" data-plan-id="${escapeHtml(plan.id)}" type="number" min="0" step="1" value="${escapeHtml(plan.price)}"></td><td><button class="admin-save-price" data-plan-id="${escapeHtml(plan.id)}" type="button">Save</button></td><td>${escapeHtml(plan.pdf)}</td></tr>`).join('')}</tbody>
+        <tbody>${summary.plans.map(plan => `<tr><td>${escapeHtml(plan.name)}</td><td>${escapeHtml(plan.category)}</td><td><input class="admin-price-input" data-plan-id="${escapeHtml(plan.id)}" type="number" min="0" step="1" value="${escapeHtml(plan.price)}"></td><td><button class="admin-save-price" data-plan-id="${escapeHtml(plan.id)}" type="button">Save</button><span class="admin-price-message" data-plan-id="${escapeHtml(plan.id)}" role="status"></span></td><td>${escapeHtml(plan.pdf)}</td></tr>`).join('')}</tbody>
     `;
     document.querySelectorAll('.admin-save-price').forEach(button => {
         button.addEventListener('click', async () => {
             const planId = button.dataset.planId;
             const input = document.querySelector(`.admin-price-input[data-plan-id="${planId}"]`);
-            const response = await fetch(`/api/admin/plans/${planId}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ price: input.value })
-            });
-            button.textContent = response.ok ? 'Saved' : 'Retry';
-            if (response.ok) setTimeout(() => { button.textContent = 'Save'; }, 1200);
+            const message = document.querySelector(`.admin-price-message[data-plan-id="${planId}"]`);
+            button.disabled = true;
+            button.textContent = 'Saving...';
+            message.textContent = '';
+            try {
+                const response = await fetch(`/api/admin/plans/${planId}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ price: input.value })
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'Could not save this price.');
+                input.value = result.price;
+                message.textContent = 'Saved';
+            } catch (error) {
+                message.textContent = `Not saved: ${error.message}`;
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Save';
+            }
         });
     });
     document.getElementById('admin-orders').innerHTML = summary.orders.length ? `

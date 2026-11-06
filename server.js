@@ -66,9 +66,11 @@ function saveOrders() {
     syncFileToGitHub('data/orders.json', JSON.stringify([...orders.values()], null, 2));
 }
 
-function saveCatalogOverrides() {
-    fs.writeFileSync(catalogOverridesFile, JSON.stringify(catalogOverrides, null, 2));
-    syncFileToGitHub('data/catalog-overrides.json', JSON.stringify(catalogOverrides, null, 2));
+async function saveCatalogOverrides() {
+    const content = JSON.stringify(catalogOverrides, null, 2);
+    const synced = await syncFileToGitHub('data/catalog-overrides.json', content);
+    if (!synced) throw new Error('Could not persist catalog overrides to GitHub');
+    fs.writeFileSync(catalogOverridesFile, content);
 }
 
 function saveCatalogAdditions() {
@@ -84,7 +86,10 @@ function saveContactSubmissions() {
 async function syncFileToGitHub(repoPath, content) {
     const token = process.env.GITHUB_TOKEN;
     const repo = process.env.GITHUB_REPO;
-    if (!token || !repo) return;
+    if (!token || !repo) {
+        console.error(`GitHub sync is not configured for ${repoPath}`);
+        return false;
+    }
     const branch = process.env.GITHUB_BRANCH || 'main';
     const apiUrl = `https://api.github.com/repos/${repo}/contents/${repoPath}`;
     const headers = {
@@ -94,6 +99,10 @@ async function syncFileToGitHub(repoPath, content) {
     };
     try {
         const existing = await fetch(`${apiUrl}?ref=${branch}`, { headers });
+        if (!existing.ok && existing.status !== 404) {
+            console.error(`GitHub read failed for ${repoPath}:`, existing.status, await existing.text());
+            return false;
+        }
         const existingData = existing.ok ? await existing.json() : null;
         const response = await fetch(apiUrl, {
             method: 'PUT',
@@ -107,9 +116,12 @@ async function syncFileToGitHub(repoPath, content) {
         });
         if (!response.ok) {
             console.error(`GitHub sync failed for ${repoPath}:`, response.status, await response.text());
+            return false;
         }
+        return true;
     } catch (error) {
         console.error(`GitHub sync error for ${repoPath}:`, error.message);
+        return false;
     }
 }
 
@@ -201,7 +213,7 @@ app.get('/api/admin/summary', requireAdmin, (request, response) => {
     });
 });
 
-app.patch('/api/admin/plans/:id', requireAdmin, (request, response) => {
+app.patch('/api/admin/plans/:id', requireAdmin, async (request, response) => {
     const planId = Number(request.params.id);
     const plan = getCatalogPlans().find(item => item.id === planId);
     if (!plan) return response.status(404).json({ error: 'Plan not found' });
@@ -211,8 +223,16 @@ app.patch('/api/admin/plans/:id', requireAdmin, (request, response) => {
         return response.status(400).json({ error: 'Price must be a valid positive number' });
     }
 
-    catalogOverrides[String(planId)] = { ...(catalogOverrides[String(planId)] || {}), price };
-    saveCatalogOverrides();
+    const overrideKey = String(planId);
+    const previousOverride = catalogOverrides[overrideKey];
+    catalogOverrides[overrideKey] = { ...(previousOverride || {}), price };
+    try {
+        await saveCatalogOverrides();
+    } catch (error) {
+        if (previousOverride) catalogOverrides[overrideKey] = previousOverride;
+        else delete catalogOverrides[overrideKey];
+        return response.status(502).json({ error: 'Price was not saved permanently. Check the Render GitHub token and repository settings, then try again.' });
+    }
     const updatedPlan = { ...plan, ...catalogOverrides[String(planId)] };
     plans.set(planId, { name: updatedPlan.name, price: updatedPlan.price, pdf: path.basename(updatedPlan.pdf) });
     return response.json(updatedPlan);
