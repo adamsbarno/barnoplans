@@ -3,7 +3,7 @@ services:
     name: barno-plans
     runtime: node
     region: oregon
-    plan: free
+    plan: 0.5c-512mb
     branch: main
     buildCommand: npm install
     startCommand: npm start
