@@ -1681,6 +1681,11 @@ a {
     color: var(--muted);
 }
 
+.currency-note {
+    margin-top: 5px;
+    font-size: 0.85rem;
+}
+
 .plans-container {
     gap: 28px;
     margin-top: 42px;

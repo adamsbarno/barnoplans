@@ -98,11 +98,11 @@
             <!-- Price -->
             <div class="product-price">
 
-                KSh 2,000
+                KSh 2,000 / approx. US$15.39
 
             </div>
 
-            <p class="trust-note">Secure payment &bull; Instant PDF delivery after confirmation</p>
+            <p class="trust-note">USD amount is approximate; Pesapal charges in KSh.</p>
 
 
             <!-- Included + Purchase -->
@@ -241,6 +241,22 @@
             <button class="image-modal-close" type="button" aria-label="Close image preview">&times;</button>
             <img id="image-modal-img" src="" alt="Expanded plan image">
         </div>
+    </div>
+
+    <div id="pesapal-checkout-modal" class="modal" aria-hidden="true">
+        <section class="modal-content checkout-modal-content" role="dialog" aria-modal="true" aria-labelledby="pesapal-checkout-title">
+            <button class="close-modal" id="pesapal-checkout-close" type="button" aria-label="Close Pesapal checkout details">&times;</button>
+            <h2 id="pesapal-checkout-title">Continue to Pesapal</h2>
+            <p>Enter your email for order confirmation. A phone number is optional; include your country code if you provide one.</p>
+            <form id="pesapal-checkout-form">
+                <label for="pesapal-customer-email">Email address</label>
+                <input id="pesapal-customer-email" name="email" type="email" autocomplete="email" maxlength="254" required>
+                <label for="pesapal-customer-phone">Phone number (optional)</label>
+                <input id="pesapal-customer-phone" name="phone" type="tel" autocomplete="tel" placeholder="+254 712 345 678 or +44 7700 900123">
+                <p class="admin-message" id="pesapal-checkout-message" role="alert"></p>
+                <button class="button" id="pesapal-checkout-submit" type="submit">Continue to secure payment</button>
+            </form>
+        </section>
     </div>
 
     <script type="module" src="data/plans.js"></script>

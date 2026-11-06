@@ -270,12 +270,25 @@ app.post('/api/admin/plans', requireAdmin, upload.fields([
     return response.status(201).json(plan);
 });
 
-function normalizePhoneNumber(phoneNumber) {
-    if (typeof phoneNumber !== 'string') return null;
-    const digits = phoneNumber.replace(/\D/g, '');
-    if (/^07\d{8}$/.test(digits)) return `254${digits.slice(1)}`;
-    if (/^2547\d{8}$/.test(digits)) return digits;
-    return null;
+function normalizeInternationalPhoneNumber(phoneNumber) {
+    if (typeof phoneNumber !== 'string') return phoneNumber == null ? '' : null;
+    const rawPhoneNumber = phoneNumber.trim();
+    if (!rawPhoneNumber) return '';
+
+    let normalizedPhoneNumber = rawPhoneNumber.replace(/[^\d+]/g, '');
+    if (normalizedPhoneNumber.startsWith('00')) {
+        normalizedPhoneNumber = `+${normalizedPhoneNumber.slice(2)}`;
+    } else if (/^0[17]\d{8}$/.test(normalizedPhoneNumber)) {
+        normalizedPhoneNumber = `+254${normalizedPhoneNumber.slice(1)}`;
+    } else if (/^254[17]\d{8}$/.test(normalizedPhoneNumber)) {
+        normalizedPhoneNumber = `+${normalizedPhoneNumber}`;
+    }
+
+    return /^\+[1-9]\d{6,14}$/.test(normalizedPhoneNumber) ? normalizedPhoneNumber : null;
+}
+
+function isValidEmailAddress(emailAddress) {
+    return typeof emailAddress === 'string' && emailAddress.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailAddress);
 }
 
 function getPesapalBaseUrl() {
@@ -354,17 +367,18 @@ app.post('/api/admin/pesapal/register-ipn', requireAdmin, async (request, respon
 
 app.post('/api/pesapal/orders', async (request, response) => {
     const planId = Number(request.body?.planId);
-    const phoneNumber = normalizePhoneNumber(request.body?.phoneNumber);
+    const emailAddress = String(request.body?.emailAddress || '').trim();
+    const phoneNumber = normalizeInternationalPhoneNumber(request.body?.phoneNumber);
     const plan = plans.get(planId);
     const publicUrl = getPublicAppUrl();
 
-    if (!plan || !phoneNumber) {
-        return response.status(400).json({ error: 'Choose a valid plan and enter a Kenyan mobile number.' });
+    if (!plan || !isValidEmailAddress(emailAddress) || phoneNumber === null) {
+        return response.status(400).json({ error: 'Enter a valid email address and, if provided, a valid international phone number with its country code.' });
     }
     if (!hasPesapalCredentials() || !process.env.PESAPAL_IPN_ID ||
         process.env.PESAPAL_IPN_ENVIRONMENT !== getPesapalEnvironment() || !publicUrl ||
         !process.env.DOWNLOAD_TOKEN_SECRET || process.env.DOWNLOAD_TOKEN_SECRET.length < 32) {
-        return response.status(503).json({ error: 'Online payments are not configured yet. Please use the manual M-Pesa option.' });
+        return response.status(503).json({ error: 'Online payments are not configured yet. Please contact Barno Plans for assistance.' });
     }
 
     try {
@@ -388,15 +402,15 @@ app.post('/api/pesapal/orders', async (request, response) => {
                 redirect_mode: 'TOP_WINDOW',
                 notification_id: process.env.PESAPAL_IPN_ID,
                 billing_address: {
-                    phone_number: phoneNumber,
-                    country_code: 'KE'
+                    email_address: emailAddress,
+                    ...(phoneNumber ? { phone_number: phoneNumber } : {})
                 }
             })
         });
         const result = await resultResponse.json();
         if (!resultResponse.ok || !result.redirect_url || !result.order_tracking_id) {
             console.error('Pesapal order request rejected:', result.error?.message || result.message || 'No redirect URL');
-            return response.status(502).json({ error: 'Pesapal could not start checkout. Please try again or use manual M-Pesa.' });
+            return response.status(502).json({ error: 'Pesapal could not start checkout. Please try again.' });
         }
 
         orders.set(merchantReference, {
@@ -405,7 +419,7 @@ app.post('/api/pesapal/orders', async (request, response) => {
             planName: plan.name,
             amount: plan.price,
             currency: 'KES',
-            phoneNumber,
+            phoneNumber: phoneNumber || null,
             paymentProvider: 'pesapal',
             pesapalTrackingId: result.order_tracking_id,
             status: 'pending',
@@ -415,7 +429,7 @@ app.post('/api/pesapal/orders', async (request, response) => {
         return response.json({ redirectUrl: result.redirect_url });
     } catch (error) {
         console.error('Pesapal checkout error:', error.message);
-        return response.status(502).json({ error: 'Could not start Pesapal checkout. Please try again or use manual M-Pesa.' });
+        return response.status(502).json({ error: 'Could not start Pesapal checkout. Please try again.' });
     }
 });
 

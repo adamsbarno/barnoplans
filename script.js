@@ -6,7 +6,17 @@ import { housePlans } from './data/plans.js';
 // ===========================
 
 let planCatalog = new BarnoCatalog(housePlans);
+const USD_TO_KES_RATE = 129.95;
 window.dataLayer = window.dataLayer || [];
+
+function formatDualPrice(price) {
+    const usdEstimate = Number(price) / USD_TO_KES_RATE;
+    return `KSh ${Number(price).toLocaleString()} / approx. US$${usdEstimate.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    })}`;
+}
+
 function trackEvent(name, details = {}) {
     window.dataLayer.push({ name, ...details, timestamp: new Date().toISOString() });
 }
@@ -59,7 +69,7 @@ function renderPlanCards(plans, containerId) {
         details.textContent = `${plan.bedrooms} Bedrooms - ${plan.bathrooms} Bathrooms`;
         const price = document.createElement('p');
         price.className = 'price';
-        price.textContent = `KSh ${plan.price.toLocaleString()}`;
+        price.textContent = formatDualPrice(plan.price);
         const link = document.createElement('a');
         link.className = 'view-plan';
         link.href = `plan-details.html?id=${encodeURIComponent(plan.id)}`;
@@ -114,7 +124,7 @@ function renderComparison() {
         ['Bedrooms', plan => plan.bedrooms],
         ['Bathrooms', plan => plan.bathrooms],
         ['Floors', plan => plan.floors],
-        ['Price', plan => `KSh ${plan.price.toLocaleString()}`]
+        ['Price', plan => formatDualPrice(plan.price)]
     ].map(([label, value]) => `<tr><th>${label}</th>${selectedPlans.map(plan => `<td>${value(plan)}</td>`).join('')}</tr>`).join('')}</tbody>`;
     container.replaceChildren(table);
     panel.hidden = false;
@@ -362,7 +372,7 @@ function loadPlanDetails(plan) {
     
     // Update price
     const priceEl = document.querySelector('.product-price');
-    if (priceEl) priceEl.textContent = `KSh ${plan.price.toLocaleString()}`;
+    if (priceEl) priceEl.textContent = formatDualPrice(plan.price);
     
     // Update features
     const featuresEl = document.querySelector('.features');
@@ -491,48 +501,79 @@ function setupThumbnailGallery(plan) {
 
 // Pesapal checkout
 function buyPlanWithPesapal(plan) {
-    const enteredNumber = prompt('Enter your phone number for Pesapal checkout (07xxxxxxxx or 2547xxxxxxxx):', '07');
-    if (enteredNumber === null) return;
-    const phoneNumber = normalizePhoneNumber(enteredNumber);
+    const modal = document.getElementById('pesapal-checkout-modal');
+    const form = document.getElementById('pesapal-checkout-form');
+    const emailInput = document.getElementById('pesapal-customer-email');
+    const phoneInput = document.getElementById('pesapal-customer-phone');
+    const message = document.getElementById('pesapal-checkout-message');
+    const submitButton = document.getElementById('pesapal-checkout-submit');
+    const closeButton = document.getElementById('pesapal-checkout-close');
+    if (!modal || !form || !emailInput || !phoneInput || !message || !submitButton) return;
 
-    if (!phoneNumber) {
-        alert('Please enter a valid Kenyan phone number.');
-        return;
-    }
+    form.reset();
+    message.textContent = '';
+    modal.style.display = 'block';
+    modal.setAttribute('aria-hidden', 'false');
+    emailInput.focus();
 
-    startPesapalPayment(plan, phoneNumber);
-}
+    const closeModal = () => {
+        modal.style.display = 'none';
+        modal.setAttribute('aria-hidden', 'true');
+        buyButtonFocus(plan);
+    };
+    closeButton.onclick = closeModal;
+    modal.onclick = event => {
+        if (event.target === modal) closeModal();
+    };
 
-function normalizePhoneNumber(phoneNumber) {
-    if (!phoneNumber) return null;
-    const digits = phoneNumber.replace(/\D/g, '');
-    if (/^07\d{8}$/.test(digits)) return `254${digits.slice(1)}`;
-    if (/^2547\d{8}$/.test(digits)) return digits;
-    return null;
-}
-
-async function startPesapalPayment(plan, phoneNumber) {
-    const buyButton = document.querySelector('.buy-button');
-    if (buyButton) {
-        buyButton.disabled = true;
-        buyButton.textContent = 'Opening secure checkout...';
-    }
-
-    try {
-        const response = await fetch('/api/pesapal/orders', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ planId: plan.id, phoneNumber })
-        });
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.error || 'Payment could not start');
-        window.location.assign(result.redirectUrl);
-    } catch (error) {
-        alert(error.message);
-        if (buyButton) {
-            buyButton.disabled = false;
-            buyButton.textContent = 'Pay securely with Pesapal';
+    form.onsubmit = async event => {
+        event.preventDefault();
+        message.textContent = '';
+        const emailAddress = emailInput.value.trim();
+        const phoneNumber = normalizeInternationalPhoneNumber(phoneInput.value);
+        if (phoneNumber === null) {
+            message.textContent = 'Enter a valid phone number with its country code, such as +44 7700 900123, or leave it blank.';
+            phoneInput.focus();
+            return;
         }
+
+        submitButton.disabled = true;
+        submitButton.textContent = 'Opening secure checkout...';
+        try {
+            const response = await fetch('/api/pesapal/orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ planId: plan.id, emailAddress, phoneNumber })
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error || 'Payment could not start');
+            window.location.assign(result.redirectUrl);
+        } catch (error) {
+            message.textContent = error.message;
+            submitButton.disabled = false;
+            submitButton.textContent = 'Continue to secure payment';
+        }
+    };
+}
+
+function buyButtonFocus(plan) {
+    const button = document.querySelector(`.buy-button[data-plan-id="${plan.id}"]`);
+    button?.focus();
+}
+
+function normalizeInternationalPhoneNumber(phoneNumber) {
+    const rawPhoneNumber = String(phoneNumber || '').trim();
+    if (!rawPhoneNumber) return '';
+
+    let normalizedPhoneNumber = rawPhoneNumber.replace(/[^\d+]/g, '');
+    if (normalizedPhoneNumber.startsWith('00')) {
+        normalizedPhoneNumber = `+${normalizedPhoneNumber.slice(2)}`;
+    } else if (/^0[17]\d{8}$/.test(normalizedPhoneNumber)) {
+        normalizedPhoneNumber = `+254${normalizedPhoneNumber.slice(1)}`;
+    } else if (/^254[17]\d{8}$/.test(normalizedPhoneNumber)) {
+        normalizedPhoneNumber = `+${normalizedPhoneNumber}`;
     }
+
+    return /^\+[1-9]\d{6,14}$/.test(normalizedPhoneNumber) ? normalizedPhoneNumber : null;
 }
 
