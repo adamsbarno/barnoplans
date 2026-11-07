@@ -243,6 +243,18 @@ document.addEventListener('DOMContentLoaded', async function() {
             alert('Your enquiry has been received. Barno Plans will contact you soon.');
         }).catch(error => alert(error.message));
     });
+
+    document.getElementById('review-form')?.addEventListener('submit', function(event) {
+        event.preventDefault();
+        const formData = new FormData(event.currentTarget);
+        const name = String(formData.get('name') || '').trim() || 'Anonymous';
+        const rating = String(formData.get('rating') || '');
+        const review = String(formData.get('review') || '').trim();
+        const reviewMessage = document.getElementById('review-form-message');
+        const whatsappText = `Barno Plans customer review\nName: ${name}\nRating: ${rating}/5\nReview: ${review}`;
+        window.location.assign(`https://wa.me/254710304401?text=${encodeURIComponent(whatsappText)}`);
+        reviewMessage.textContent = 'WhatsApp is opening with your review. Please check the message and press Send to share it.';
+    });
     
     // Render featured plans on index.html
     if (document.getElementById('featured-plans-container')) {

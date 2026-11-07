@@ -155,10 +155,25 @@
         </div>
         <div class="reviews-grid">
             <article class="review-card review-request reviews-empty">
-                <div class="review-stars" aria-hidden="true">★★★★★</div>
-                <strong>Be among the first to share your experience.</strong>
-                <p>Tell us what helped you choose your plan, how the package supported your next step, and what we can improve.</p>
-                <a href="mailto:barnoplans@gmail.com?subject=Barno%20Plans%20review">Share your review</a>
+                <strong>Share your experience.</strong>
+                <p>Tell us what helped you choose a plan and how it supported your next step. Reviews are sent privately to Barno Plans and are not published automatically.</p>
+                <form id="review-form" class="contact-form">
+                    <label for="review-name">Your name (optional)</label>
+                    <input id="review-name" name="name" type="text" maxlength="80" autocomplete="name" placeholder="Name or anonymous">
+                    <label for="review-rating">Your rating</label>
+                    <select id="review-rating" name="rating" required>
+                        <option value="">Choose a rating</option>
+                        <option value="5">5 - Excellent</option>
+                        <option value="4">4 - Good</option>
+                        <option value="3">3 - Okay</option>
+                        <option value="2">2 - Poor</option>
+                        <option value="1">1 - Very poor</option>
+                    </select>
+                    <label for="review-text">Your review</label>
+                    <textarea id="review-text" name="review" rows="4" maxlength="1200" required placeholder="Share your feedback"></textarea>
+                    <button class="button" type="submit">Continue on WhatsApp</button>
+                    <p class="admin-message" id="review-form-message" role="status" aria-live="polite"></p>
+                </form>
             </article>
         </div>
     </section>
