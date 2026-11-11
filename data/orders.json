@@ -46,5 +46,17 @@
     "pesapalTrackingId": "6cd63e6b-50c5-4bd6-b608-d9afe6ce6e63",
     "status": "pending",
     "createdAt": "2026-11-09T10:04:50.758Z"
+  },
+  {
+    "orderId": "BP-2-7ef49d96-e208-4402-b470-25f8148e20ab",
+    "planId": 2,
+    "planName": "3 Bedroom All Ensuite Plan 2",
+    "amount": 2500,
+    "currency": "KES",
+    "phoneNumber": null,
+    "paymentProvider": "pesapal",
+    "pesapalTrackingId": "7c3d1455-fbed-48e9-b554-d9ad97d04626",
+    "status": "pending",
+    "createdAt": "2026-11-11T19:06:52.400Z"
   }
 ]
