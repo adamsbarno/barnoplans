@@ -46,5 +46,65 @@
     "pesapalTrackingId": "6cd63e6b-50c5-4bd6-b608-d9afe6ce6e63",
     "status": "pending",
     "createdAt": "2026-11-09T10:04:50.758Z"
+  },
+  {
+    "orderId": "BP-2-7ef49d96-e208-4402-b470-25f8148e20ab",
+    "planId": 2,
+    "planName": "3 Bedroom All Ensuite Plan 2",
+    "amount": 2500,
+    "currency": "KES",
+    "phoneNumber": null,
+    "paymentProvider": "pesapal",
+    "pesapalTrackingId": "7c3d1455-fbed-48e9-b554-d9ad97d04626",
+    "status": "pending",
+    "createdAt": "2026-11-11T19:06:52.400Z"
+  },
+  {
+    "orderId": "BP-1-0e87e5e6-90a3-4db9-8faa-ccef8e02f1c3",
+    "planId": 1,
+    "planName": "4 Bedroom Bungalow",
+    "amount": 3999,
+    "currency": "KES",
+    "phoneNumber": "+254720849808",
+    "paymentProvider": "pesapal",
+    "pesapalTrackingId": "d202fe68-36cd-40f0-a696-d9aca6ae3b52",
+    "status": "pending",
+    "createdAt": "2026-11-12T10:02:39.701Z"
+  },
+  {
+    "orderId": "BP-4-d6bb1165-3de6-4e86-bdd6-7596c1c9767f",
+    "planId": 4,
+    "planName": "2 Bedroom Family Home",
+    "amount": 2200,
+    "currency": "KES",
+    "phoneNumber": "+254743153060",
+    "paymentProvider": "pesapal",
+    "pesapalTrackingId": "f3a259e5-1d1a-4345-9a2c-d9a8a87c2481",
+    "status": "pending",
+    "createdAt": "2026-11-16T10:33:59.211Z"
+  },
+  {
+    "orderId": "BP-6-cd9dbf4a-a63d-4a7f-b012-351c48bc59fd",
+    "planId": 6,
+    "planName": "3 Bedroom House Plan 2",
+    "amount": 2000,
+    "currency": "KES",
+    "phoneNumber": "+254768422505",
+    "paymentProvider": "pesapal",
+    "pesapalTrackingId": "c861ace0-812a-4396-a32a-d9a0a5a8af1f",
+    "status": "failed",
+    "createdAt": "2026-11-24T08:49:22.143Z"
+  },
+  {
+    "orderId": "BP-3-22626835-0bb1-4113-a097-0a575835420d",
+    "planId": 3,
+    "planName": "3 Bedroom Bungalow",
+    "amount": 2500,
+    "currency": "KES",
+    "phoneNumber": null,
+    "paymentProvider": "pesapal",
+    "pesapalTrackingId": "c5abc1b4-db50-4944-9499-d9a017e9af84",
+    "status": "pending",
+    "createdAt": "2026-11-24T09:28:30.048Z"
   }
 ]
