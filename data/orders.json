@@ -82,5 +82,17 @@
     "pesapalTrackingId": "f3a259e5-1d1a-4345-9a2c-d9a8a87c2481",
     "status": "pending",
     "createdAt": "2026-11-16T10:33:59.211Z"
+  },
+  {
+    "orderId": "BP-6-cd9dbf4a-a63d-4a7f-b012-351c48bc59fd",
+    "planId": 6,
+    "planName": "3 Bedroom House Plan 2",
+    "amount": 2000,
+    "currency": "KES",
+    "phoneNumber": "+254768422505",
+    "paymentProvider": "pesapal",
+    "pesapalTrackingId": "c861ace0-812a-4396-a32a-d9a0a5a8af1f",
+    "status": "pending",
+    "createdAt": "2026-11-24T08:49:22.143Z"
   }
 ]
