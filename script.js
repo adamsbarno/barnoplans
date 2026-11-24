@@ -563,7 +563,7 @@ function buyPlanWithPesapal(plan) {
         } catch (error) {
             message.textContent = error.message;
             submitButton.disabled = false;
-            submitButton.textContent = 'Continue to secure payment';
+            submitButton.textContent = 'Pay now and download';
         }
     };
 }
