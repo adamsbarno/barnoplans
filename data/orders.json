@@ -92,7 +92,7 @@
     "phoneNumber": "+254768422505",
     "paymentProvider": "pesapal",
     "pesapalTrackingId": "c861ace0-812a-4396-a32a-d9a0a5a8af1f",
-    "status": "pending",
+    "status": "failed",
     "createdAt": "2026-11-24T08:49:22.143Z"
   }
 ]
