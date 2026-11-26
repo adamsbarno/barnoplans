@@ -106,5 +106,17 @@
     "pesapalTrackingId": "c5abc1b4-db50-4944-9499-d9a017e9af84",
     "status": "pending",
     "createdAt": "2026-11-24T09:28:30.048Z"
+  },
+  {
+    "orderId": "BP-3-3628a90d-a469-4e30-80b8-9d336e4db486",
+    "planId": 3,
+    "planName": "3 Bedroom Bungalow",
+    "amount": 1000,
+    "currency": "KES",
+    "phoneNumber": "+254716338908",
+    "paymentProvider": "pesapal",
+    "pesapalTrackingId": "912e7cb1-81db-4476-82ca-d99e9302ba0e",
+    "status": "pending",
+    "createdAt": "2026-11-26T03:27:15.482Z"
   }
 ]
