@@ -116,7 +116,7 @@
     "phoneNumber": "+254716338908",
     "paymentProvider": "pesapal",
     "pesapalTrackingId": "912e7cb1-81db-4476-82ca-d99e9302ba0e",
-    "status": "pending",
+    "status": "failed",
     "createdAt": "2026-11-26T03:27:15.482Z"
   }
 ]
