@@ -130,5 +130,17 @@
     "pesapalTrackingId": "6329ed01-caeb-4764-a4f0-d99ea8bc6ef5",
     "status": "pending",
     "createdAt": "2026-11-26T06:00:34.322Z"
+  },
+  {
+    "orderId": "BP-4-1d274f8c-2bac-41b7-a827-9ddfe6bc2bba",
+    "planId": 4,
+    "planName": "2 Bedroom Family Home",
+    "amount": 2200,
+    "currency": "KES",
+    "phoneNumber": null,
+    "paymentProvider": "pesapal",
+    "pesapalTrackingId": "7ae959ee-367c-4d01-b9c2-d99ec5068776",
+    "status": "pending",
+    "createdAt": "2026-11-26T10:29:30.797Z"
   }
 ]
